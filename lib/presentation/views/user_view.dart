@@ -18,7 +18,7 @@ class _UserViewState extends State<UserView> {
         body: Center(
             child: Column(
           children: const [
-            Text("¡Bienvenido a Profile!",
+            Text("¡Bienvenido a User!",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontFamily: 'Poppins', fontSize: 35))
           ],

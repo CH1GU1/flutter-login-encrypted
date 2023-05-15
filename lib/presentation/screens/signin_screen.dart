@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:login_encrypted/presentation/screens/signup_screen.dart';
 import 'package:login_encrypted/presentation/views/admin_view.dart';
 import 'package:login_encrypted/presentation/views/user_view.dart';
 
+import '../reusable_widget/reusable_widget.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -34,15 +36,16 @@ class _LoginFormState extends State<LoginForm> {
                 style: TextStyle(fontFamily: 'Poppins', fontSize: 50),
               ),
               const Divider(
-                height: 15,
+                height: 20,
               ),
               const Text(
                 'Seguridad 2023-1',
-                style: TextStyle(fontFamily: 'Poppins', fontSize: 20),
+                style: TextStyle(
+                    fontFamily: 'Poppins', fontSize: 20, letterSpacing: 2),
               ),
               SizedBox(
                 width: 160,
-                height: 20,
+                height: 40,
                 child: Divider(
                   color: Colors.blueGrey[600],
                 ),
@@ -81,7 +84,7 @@ class _LoginFormState extends State<LoginForm> {
               const Divider(
                 height: 20,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 20),
               ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Stack(
@@ -113,7 +116,8 @@ class _LoginFormState extends State<LoginForm> {
               ),
               const Divider(
                 height: 20,
-              )
+              ),
+              signUpOption()
             ],
           )
         ],
@@ -121,20 +125,64 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
-  void _login() {
+  Row signUpOption() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text("Dont have account?  ",
+            style: TextStyle(color: Colors.black87)),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const SignUpScreen()));
+          },
+          child: const Text("Sign Up",
+              style: TextStyle(
+                  color: Colors.black87, fontWeight: FontWeight.bold)),
+        )
+      ],
+    );
+  }
+
+  Future<void> _login() async {
+    final navigator = Navigator.of(context);
     // Verificar si las credenciales coinciden con las quemadas
     if (_email != '' && _password != '') {
-      // Navegar a la siguiente pantalla si las credenciales son correctas
-      if (_email == "admin" && _password == "admin1234") {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const AdminView()));
-      }else if (_email == "julian" && _password == "juliancito"){
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => const UserView()));
-      }
-      //Si es admin, ir a admin
+      var resultado = await validarInicioSesion(_email, _password);
+      if (resultado.isNotEmpty) {
+        // Inicio de sesión exitoso
+        print("Inicio de sesión exitoso");
+        print("A LOGUEAR: $resultado");
 
-      //Si es otro, ir a otro
+        if (resultado['rol'] == 'Admin') {
+          navigator.push(MaterialPageRoute(builder: (context) => const AdminView()));
+        } else if (resultado['rol'] == 'User') {
+          navigator.push(MaterialPageRoute(builder: (context) => const UserView()));
+        }
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error de inicio de sesión'),
+              content:
+                  const Text('El usuario no existe o credenciales incorrectas'),
+              actions: [
+                TextButton(
+                  child: const Text('Aceptar'),
+                  onPressed: () {
+                    navigator.pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+      var map = await recuperarUsuarios();
+      var map2 = map.toString();
+      print("MAP: $map2");
+      //await eliminarArchivo();
     } else {
       // Mostrar un diálogo de error si las credenciales son incorrectas
       showDialog(
