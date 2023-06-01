@@ -13,9 +13,11 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
+  //Inicialización de tipo late para las variables de _email y _password
   late String _email;
   late String _password;
 
+  //Se crea el Widget principal con todo el contenido visual
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -109,7 +111,7 @@ class _LoginFormState extends State<LoginForm> {
                           textStyle: const TextStyle(
                               fontFamily: 'Poppins', fontSize: 25),
                         ),
-                        onPressed: _login,
+                        onPressed: _login, //Llamada al metodo de login
                         child: const Text('Sign In')),
                   ],
                 ),
@@ -117,7 +119,7 @@ class _LoginFormState extends State<LoginForm> {
               const Divider(
                 height: 20,
               ),
-              signUpOption()
+              signUpOption() //Llamada al metodo de registro
             ],
           )
         ],
@@ -125,6 +127,7 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
+  //Metodo que se aloja en el texto Sign Up para ejectar la View de registro de usuario
   Row signUpOption() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -144,22 +147,25 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 
+  //Metodo asincrono de Login que chequea credenciales
   Future<void> _login() async {
     final navigator = Navigator.of(context);
     // Verificar si las credenciales coinciden con las quemadas
     if (_email != '' && _password != '') {
-      var resultado = await validarInicioSesion(_email, _password);
+      var resultado = await validarInicioSesion(_email, _password); //Paso de parametros para validar credenciales en el archivo de texto
       if (resultado.isNotEmpty) {
         // Inicio de sesión exitoso
         print("Inicio de sesión exitoso");
         print("A LOGUEAR: $resultado");
 
+        //Validacion dependiendo del rol del usuario a loguear, se despliega la View asociada.
         if (resultado['rol'] == 'Admin') {
           navigator.push(MaterialPageRoute(builder: (context) => const AdminView()));
         } else if (resultado['rol'] == 'User') {
           navigator.push(MaterialPageRoute(builder: (context) => const UserView()));
         }
       } else {
+        //Despliegue de un dialogo en caso que las credenciales no sean correctas
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -182,9 +188,9 @@ class _LoginFormState extends State<LoginForm> {
       var map = await recuperarUsuarios();
       var map2 = map.toString();
       print("MAP: $map2");
-      //await eliminarArchivo();
+      
     } else {
-      // Mostrar un diálogo de error si las credenciales son incorrectas
+      // Mostrar un diálogo de error si el email no es ingresado
       showDialog(
         context: context,
         builder: (BuildContext context) {

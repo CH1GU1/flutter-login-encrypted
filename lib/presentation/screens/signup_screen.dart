@@ -10,10 +10,13 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  //Inicializacion de controladoras de los TextFields
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
-  bool isAdmin = false; // Variable para almacenar el estado del checkbox
+  bool isAdmin =
+      false; // Variable para almacenar el perfil del usuario a manera de checkbox
 
+  //Creacion del Widget principal del View
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,9 +76,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             _passwordTextController, isAdmin);
 
                         navigator.push(MaterialPageRoute(
-                                    builder: (context) => const LoginForm()));
-
-                            
+                            builder: (context) => const LoginForm()));
                       },
                       child: const Text("SIGN UP")),
                 ),
@@ -86,16 +87,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
-}
 
-Future<void> _register(TextEditingController emailTextController,
-    TextEditingController passwordTextController, bool admin) async {
-  var email = emailTextController.text;
-  var password = passwordTextController.text;
-  var role = "Admin";
-  if (!admin) {
-    role = "User";
+  //Metodo que realiza el registro del usuario dado su email, contraseña y rol de usuario (usuario normal o Administrador)
+  Future<void> _register(TextEditingController emailTextController,
+      TextEditingController passwordTextController, bool admin) async {
+    //Se inicializan las variables de email, password y rol dada las entradas del usuario
+    var email = emailTextController.text;
+    var password = passwordTextController.text;
+    var role = "Admin";
+    //Se ejecuta la validacion del boolean sobre el rol del usuario
+    if (!admin) {
+      role = "User";
+    }
+    if (email.isNotEmpty && email.isNotEmpty) {
+      //Se llama al metodo para realizar la generacion del cifrado como tambien guardarlo en el archivo txt
+      await generatePasswordHashComplete(password, role, email);
+    } else {
+      //Si hay un campo faltante, se muestra en una snackbar con mensaje
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter both email and password.'),
+        ),
+      );
+    }
   }
-
-  await generatePasswordHashComplete(password, role, email);
 }
